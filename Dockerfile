@@ -12,6 +12,7 @@ RUN GOOS=linux CGO_ENABLED=0 go build -a -o /go/bin/plan plan.go
 FROM scratch
 
 COPY --from=builder /go/bin/plan /go/bin/plan
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 EXPOSE 5123
 
