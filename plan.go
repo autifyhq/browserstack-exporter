@@ -55,13 +55,19 @@ func (c planApiCollector) Collect(ch chan<- prometheus.Metric) {
 	client := &http.Client{Timeout: time.Second * 2}
 	request, err := http.NewRequest("GET", requestURL, nil)
 	if err != nil {
-		log.Errorln("Error creating a request to " + requestURL)
+		log.Errorf("Error creating a request to %s : %v\n", requestURL, err)
 	}
 	request.SetBasicAuth(*username, *password)
 	response, err := client.Do(request)
+	if err != nil {
+		log.Errorln("Error issueing a request to %s : %v\n", requestURL, err)
+	}
 
 	var planStatusResponse PlanStatusResponse
-	content, _ := ioutil.ReadAll(response.Body)
+	content, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Errorln("Error reading a request to %s : %v\n", requestURL, err)
+	}
 	json.Unmarshal(content, &planStatusResponse)
 
 	ch <- prometheus.MustNewConstMetric(
